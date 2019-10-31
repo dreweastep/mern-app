@@ -10,7 +10,6 @@ function ProductList({ products }) {
       fluid: true,
       childKey: product._id,
       href: `/product?_id=${product._id}`
-  
     }))
   }
 
