@@ -13,7 +13,7 @@ function catchErrors(error, displayError){
         }
     } else if (error.request){
         //The request was made but no response was recieved
-        errorMsg = erro.request;
+        errorMsg = error.request;
         console.error("Error request", errorMsg)
 
     } else {
