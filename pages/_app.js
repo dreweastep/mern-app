@@ -52,6 +52,7 @@ class MyApp extends App {
 
   componentDidMount() {
     window.addEventListener("storage", this.syncLogout)
+    window.scrollTo(0, 0)
   }
 
   syncLogout = event => {
