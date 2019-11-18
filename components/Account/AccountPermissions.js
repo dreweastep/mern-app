@@ -3,7 +3,7 @@ import axios from 'axios'
 import baseUrl from '../../utils/baseUrl'
 import cookie from 'js-cookie'
 import { Header, Checkbox, Table, Icon } from 'semantic-ui-react'
-
+import formatDate from '../../utils/formatDate'
 function AccountPermissions() {
   const [users, setUsers] = React.useState([])
 
@@ -25,7 +25,7 @@ function AccountPermissions() {
         <Icon name="settings" />
         User Permissions
       </Header>
-      <Table compact celled definition>
+      <Table compact unstackable celled definition>
         <Table.Header>
           <Table.Row>
             <Table.HeaderCell />
@@ -48,16 +48,41 @@ function AccountPermissions() {
 }
 
 function UserPermission({ user }) {
+  const [admin, setAdmin] = React.useState(user.role === 'admin')
+  const isFirstRun = React.useRef(true)
+
+  React.useEffect(() => {
+    if (isFirstRun.current) {
+      isFirstRun.current = false;
+      return;
+    }
+    updatePermission()
+  }, [admin])
+
+  function handleChangePermission() {
+    setAdmin(prevState => !prevState)
+  }
+
+  async function updatePermission() {
+    const url = `${baseUrl}/api/account`
+    const payload = { _id: user._id, role: admin ? "admin" : "user"}
+    await axios.put(url, payload)
+  }
+
   return (
     <Table.Row>
       <Table.Cell collapsing>
-        <Checkbox toggle />
+        <Checkbox
+          checked={admin}
+          toggle
+          onChange={handleChangePermission}
+        />
       </Table.Cell>
       <Table.Cell>{user.name}</Table.Cell>
       <Table.Cell>{user.email}</Table.Cell>
-      <Table.Cell>{user.createdAt}</Table.Cell>
-      <Table.Cell>{user.updatedAt}</Table.Cell>
-      <Table.Cell>{user.Role}</Table.Cell>
+      <Table.Cell>{formatDate(user.createdAt)}</Table.Cell>
+      <Table.Cell>{formatDate(user.updatedAt)}</Table.Cell>
+      <Table.Cell>{admin ? "admin" : "user"}</Table.Cell>
     </Table.Row>
   )
 }
