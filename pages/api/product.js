@@ -1,9 +1,10 @@
 import Product from '../../models/Product'
 import connectDB from '../../utils/connectDb'
+import Cart from '../../models/Cart'
 
 connectDB();
 
-export default async (req, res) => { 
+export default async (req, res) => {
     switch (req.method) {
         case "GET":
             await handleGetRequest(req, res)
@@ -28,8 +29,22 @@ async function handleGetRequest(req, res) {
 
 async function handleDeleteRequest(req, res) {
     const { _id } = req.query
-    await Product.findOneAndDelete({ _id })
-    res.status(204).json({})
+    try {
+        //Delete product by id
+        await Product.findOneAndDelete({ _id })
+
+        //Remove product from all carts
+        // await Cart.updateMany(
+        //     { "products.product": _id },
+        //     { $pull: { products: { product: _id} } }
+        // )
+
+        res.status(204).json({})
+    } catch (error) {
+        console.error(error)
+        res.status(500).send("Error deleting product")
+    }
+
 }
 
 async function handlePostRequest(req, res) {
@@ -37,7 +52,7 @@ async function handlePostRequest(req, res) {
     try {
         if (!name || !price || !description || !mediaUrl) {
             return res.status(422).send("Product missing one or more fields")
-        } 
+        }
         const product = await new Product({
             name,
             price,
@@ -49,5 +64,5 @@ async function handlePostRequest(req, res) {
         console.error(error)
         res.status(500).send("Interanl server error in creating product")
     }
-    
+
 }
